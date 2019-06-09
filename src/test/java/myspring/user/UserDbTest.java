@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.apache.ibatis.session.SqlSession;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +25,7 @@ public class UserDbTest {
 	@Autowired
 	private ApplicationContext context;
 
-	@Test
+	@Test @Ignore
 	public void dataSourceTest() {
 		DataSource ds = context.getBean("dataSource", DataSource.class);
 		try {
@@ -37,14 +38,23 @@ public class UserDbTest {
 	@Autowired
 	UserService userService;
 	
-	@Test @Ignore 
+	@Test @Ignore
+	public void configTest() {
+		SqlSession session = context.getBean("sqlSession", SqlSession.class);
+		System.out.println(session);
+		
+		UserVO user = session.selectOne("userNS.selectUserById", "gildong");
+		System.out.println(user);
+	}
+	
+	@Test
 	public void getUserTest() {
 		UserVO user = userService.getUser("gildong");
 		System.out.println(user);
 		assertEquals("홍길동", user.getName());
 	}
 	
-	@Test @Ignore
+	@Test
 	public void insertUserTest() {
 		userService.insertUser(new UserVO("dooly", "둘리", "남", "경기"));
 		for (UserVO	user : userService.getUserList()) {
@@ -52,7 +62,7 @@ public class UserDbTest {
 		}
 	}
 
-	@Test @Ignore
+	@Test
 	public void updateUserTest() {
 		userService.updateUser(new UserVO("dooly", "김둘리2", "여", "부산"));
 		for (UserVO	user : userService.getUserList()) {
